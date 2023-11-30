@@ -5,29 +5,44 @@ const uuid = require('uuid');
 const path = require('path');
 
 router.get('/notes', (req, res) => {
-  const notes = JSON.parse(fs.readFileSync(path.join(__dirname, '../..', 'db.json'), 'utf-8'));
-  res.json(notes);
+  try {
+    const notes = JSON.parse(fs.readFileSync(path.join(__dirname, '../..', 'db.json'), 'utf-8'));
+    res.json(notes);
+  } catch (error) {
+    console.error('Error handling GET request:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 router.post('/notes', (req, res) => {
-  const newNote = req.body;
-  newNote.id = uuid.v4();
+  try {
+    const newNote = req.body;
+    newNote.id = uuid.v4();
   
-  const notes = JSON.parse(fs.readFileSync(path.join(__dirname, '../..', 'db.json'), 'utf-8'));
-  notes.push(newNote);
-  fs.writeFileSync(path.join(__dirname, '../..', 'db.json'), JSON.stringify(notes));
+    const notes = JSON.parse(fs.readFileSync(path.join(__dirname, '../..', 'db.json'), 'utf-8'));
+    notes.push(newNote);
+    fs.writeFileSync(path.join(__dirname, '../..', 'db.json'), JSON.stringify(notes));
   
-  res.json(newNote);
+    res.json(newNote);
+  } catch (error) {
+    console.error('Error handling POST request:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 router.delete('/notes/:id', (req, res) => {
-  const idToDelete = req.params.id;
+  try {
+    const idToDelete = req.params.id;
   
-  const notes = JSON.parse(fs.readFileSync(path.join(__dirname, '../..', 'db.json'), 'utf-8'));
-  const updatedNotes = notes.filter(note => note.id !== idToDelete);
-  fs.writeFileSync(path.join(__dirname, '../..', 'db.json'), JSON.stringify(updatedNotes));
+    const notes = JSON.parse(fs.readFileSync(path.join(__dirname, '../..', 'db.json'), 'utf-8'));
+    const updatedNotes = notes.filter(note => note.id !== idToDelete);
+    fs.writeFileSync(path.join(__dirname, '../..', 'db.json'), JSON.stringify(updatedNotes));
   
-  res.sendStatus(200);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Error handling DELETE request:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 module.exports = router;
